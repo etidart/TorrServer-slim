@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"time"
 
-	"server/log"
+	"log"
 	"server/web/api/utils"
 
 	bolt "go.etcd.io/bbolt"
@@ -35,7 +35,7 @@ func MigrateTorrents() {
 
 	db, err := bolt.Open(filepath.Join(Path, "torrserver.db"), 0o666, &bolt.Options{Timeout: 5 * time.Second})
 	if err != nil {
-		log.TLogln("MigrateTorrents", err)
+		log.Println("MigrateTorrents", err)
 		return
 	}
 
@@ -92,7 +92,7 @@ func MigrateTorrents() {
 			if len(spec.DisplayName) > len(title) {
 				title = spec.DisplayName
 			}
-			log.TLogln("Migrate torrent", torr.Name, torr.Hash, torr.Size)
+			log.Println("Migrate torrent", torr.Name, torr.Hash, torr.Size)
 			AddTorrent(&TorrentDB{
 				TorrentSpec: spec,
 				Title:       title,
@@ -128,7 +128,7 @@ func MigrateToJson(bboltDB, jsonDB TorrServerDB) error {
 
 	if BTsets != nil {
 		msg := "Migrate0002 MUST be called before initializing BTSets"
-		log.TLogln(msg)
+		log.Println(msg)
 		os.Exit(1)
 	}
 
@@ -152,20 +152,20 @@ func MigrateToJson(bboltDB, jsonDB TorrServerDB) error {
 		if jsonDB.Get(xPath, name) == nil {
 			bboltDBBlob := bboltDB.Get(xPath, name)
 			if bboltDBBlob != nil {
-				log.TLogln(fmt.Sprintf("Attempting to migrate %s->%s from TDB to JsonDB", xPath, name))
+				log.Printf("Attempting to migrate %s->%s from TDB to JsonDB\n", xPath, name)
 				jsonDB.Set(xPath, name, bboltDBBlob)
 				jsonDBBlob := jsonDB.Get(xPath, name)
 				if isEqual, err := isByteArraysEqualJson(bboltDBBlob, jsonDBBlob); err == nil {
 					if isEqual {
-						log.TLogln(fmt.Sprintf("Migrated %s->%s successful", xPath, name))
+						log.Printf("Migrated %s->%s successful\n", xPath, name)
 					} else {
 						msg := fmt.Sprintf("Failed to migrate %s->%s TDB to JsonDB: equality check failed", xPath, name)
-						log.TLogln(msg)
+						log.Println(msg)
 						return errors.New(msg)
 					}
 				} else {
 					msg := fmt.Sprintf("Failed to migrate %s->%s TDB to JsonDB: %s", xPath, name, err)
-					log.TLogln(msg)
+					log.Println(msg)
 					return errors.New(msg)
 				}
 			}

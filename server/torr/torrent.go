@@ -11,7 +11,7 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
 
-	"server/log"
+	"log"
 	"server/settings"
 	"server/torr/state"
 	cacheSt "server/torr/storage/state"
@@ -127,7 +127,7 @@ func (t *Torrent) WaitInfo() bool {
 }
 
 func (t *Torrent) GotInfo() bool {
-	// log.TLogln("GotInfo state:", t.Stat)
+	// log.Println("GotInfo state:", t.Stat)
 	if t.Stat == state.TorrentClosed {
 		return false
 	}
@@ -171,7 +171,7 @@ func (t *Torrent) watch() {
 func (t *Torrent) progressEvent() {
 	if t.expired() {
 		if t.TorrentSpec != nil {
-			log.TLogln("Torrent close by timeout", t.TorrentSpec.InfoHash.HexString())
+			log.Println("Torrent close by timeout", t.TorrentSpec.InfoHash.HexString())
 		}
 		t.bt.RemoveTorrent(t.Hash())
 		return

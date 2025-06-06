@@ -10,7 +10,7 @@ import (
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
 
-	"server/log"
+	"log"
 	sets "server/settings"
 )
 
@@ -40,7 +40,7 @@ func LoadTorrent(tor *Torrent) *Torrent {
 func AddTorrent(spec *torrent.TorrentSpec, title, poster string, data string, category string) (*Torrent, error) {
 	torr, err := NewTorrent(spec, bts)
 	if err != nil {
-		log.TLogln("error add torrent:", err)
+		log.Println("error add torrent:", err)
 		return nil, err
 	}
 
@@ -81,7 +81,7 @@ func AddTorrent(spec *torrent.TorrentSpec, title, poster string, data string, ca
 }
 
 func SaveTorrentToDB(torr *Torrent) {
-	log.TLogln("save to db:", torr.Hash())
+	log.Println("save to db:", torr.Hash())
 	AddTorrentDB(torr)
 }
 
@@ -101,7 +101,7 @@ func GetTorrent(hashHex string) *Torrent {
 	if tr != nil {
 		tor = tr
 		go func() {
-			log.TLogln("New torrent", tor.Hash())
+			log.Println("New torrent", tor.Hash())
 			tr, _ := NewTorrent(tor.TorrentSpec, bts)
 			if tr != nil {
 				tr.Title = tor.Title
@@ -160,7 +160,7 @@ func SetTorrent(hashHex, title, poster, category string, data string) *Torrent {
 
 func RemTorrent(hashHex string) {
 	if sets.ReadOnly {
-		log.TLogln("API RemTorrent: Read-only DB mode!", hashHex)
+		log.Println("API RemTorrent: Read-only DB mode!", hashHex)
 		return
 	}
 	hash := metainfo.NewHashFromHex(hashHex)
@@ -173,7 +173,7 @@ func RemTorrent(hashHex string) {
 			}
 			err := os.Remove(name)
 			if err != nil {
-				log.TLogln("Error remove cache:", err)
+				log.Println("Error remove cache:", err)
 			}
 		}
 	}
@@ -213,36 +213,36 @@ func DropTorrent(hashHex string) {
 
 func SetSettings(set *sets.BTSets) {
 	if sets.ReadOnly {
-		log.TLogln("API SetSettings: Read-only DB mode!")
+		log.Println("API SetSettings: Read-only DB mode!")
 		return
 	}
 	sets.SetBTSets(set)
-	log.TLogln("drop all torrents")
+	log.Println("drop all torrents")
 	dropAllTorrent()
 	time.Sleep(time.Second * 1)
-	log.TLogln("disconect")
+	log.Println("disconect")
 	bts.Disconnect()
-	log.TLogln("connect")
+	log.Println("connect")
 	bts.Connect()
 	time.Sleep(time.Second * 1)
-	log.TLogln("end set settings")
+	log.Println("end set settings")
 }
 
 func SetDefSettings() {
 	if sets.ReadOnly {
-		log.TLogln("API SetDefSettings: Read-only DB mode!")
+		log.Println("API SetDefSettings: Read-only DB mode!")
 		return
 	}
 	sets.SetDefaultConfig()
-	log.TLogln("drop all torrents")
+	log.Println("drop all torrents")
 	dropAllTorrent()
 	time.Sleep(time.Second * 1)
-	log.TLogln("disconect")
+	log.Println("disconect")
 	bts.Disconnect()
-	log.TLogln("connect")
+	log.Println("connect")
 	bts.Connect()
 	time.Sleep(time.Second * 1)
-	log.TLogln("end set default settings")
+	log.Println("end set default settings")
 }
 
 func dropAllTorrent() {
@@ -255,7 +255,7 @@ func dropAllTorrent() {
 func Shutdown() {
 	bts.Disconnect()
 	sets.CloseDB()
-	log.TLogln("Received shutdown. Quit")
+	log.Println("Received shutdown. Quit")
 	os.Exit(0)
 }
 

@@ -3,15 +3,12 @@ package torr
 import (
 	"fmt"
 	"io"
-	"strconv"
 	"sync"
 	"time"
 
-	"server/ffprobe"
-
 	"github.com/anacrolix/torrent"
 
-	"server/log"
+	"log"
 	"server/settings"
 	"server/torr/state"
 	utils2 "server/utils"
@@ -67,25 +64,14 @@ func (t *Torrent) Preload(index int, size int64) {
 		go func() {
 			for t.Stat == state.TorrentPreload {
 				stat := fmt.Sprint(file.Torrent().InfoHash().HexString(), " ", utils2.Format(float64(t.PreloadedBytes)), "/", utils2.Format(float64(t.PreloadSize)), " Speed:", utils2.Format(t.DownloadSpeed), " Peers:", t.Torrent.Stats().ActivePeers, "/", t.Torrent.Stats().TotalPeers, " [Seeds:", t.Torrent.Stats().ConnectedSeeders, "]")
-				log.TLogln("Preload:", stat)
+				log.Println("Preload:", stat)
 				t.AddExpiredTime(timeout)
 				time.Sleep(time.Second)
 			}
 		}()
 
-		if ffprobe.Exists() {
-			link := "http://127.0.0.1:" + settings.Port + "/play/" + t.Hash().HexString() + "/" + strconv.Itoa(index)
-			if settings.Ssl {
-				link = "https://127.0.0.1:" + settings.SslPort + "/play/" + t.Hash().HexString() + "/" + strconv.Itoa(index)
-			}
-			if data, err := ffprobe.ProbeUrl(link); err == nil {
-				t.BitRate = data.Format.BitRate
-				t.DurationSeconds = data.Format.DurationSeconds
-			}
-		}
-
 		if t.Stat == state.TorrentClosed {
-			log.TLogln("End preload: torrent closed")
+			log.Println("End preload: torrent closed")
 			return
 		}
 
@@ -150,7 +136,7 @@ func (t *Torrent) Preload(index int, size int64) {
 		for offset+int64(len(tmp)) < readerStartEnd {
 			n, err := readerStart.Read(tmp)
 			if err != nil {
-				log.TLogln("Error preload:", err)
+				log.Println("Error preload:", err)
 				return
 			}
 			offset += int64(n)
@@ -162,7 +148,7 @@ func (t *Torrent) Preload(index int, size int64) {
 
 		wg.Wait()
 	}
-	log.TLogln("End preload:", file.Torrent().InfoHash().HexString(), "Peers:", t.Torrent.Stats().ActivePeers, "/", t.Torrent.Stats().TotalPeers, "[ Seeds:", t.Torrent.Stats().ConnectedSeeders, "]")
+	log.Println("End preload:", file.Torrent().InfoHash().HexString(), "Peers:", t.Torrent.Stats().ActivePeers, "/", t.Torrent.Stats().TotalPeers, "[ Seeds:", t.Torrent.Stats().ConnectedSeeders, "]")
 }
 
 func (t *Torrent) findFileIndex(index int) *torrent.File {

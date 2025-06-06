@@ -5,28 +5,17 @@ import (
 	"os"
 	"sort"
 
-	"server/rutor"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/location"
 	"github.com/gin-gonic/gin"
 	"github.com/wlynxg/anet"
 
-	"server/dlna"
 	"server/settings"
-	"server/web/msx"
 
-	"server/log"
+	"log"
 	"server/torr"
 	"server/version"
 	"server/web/api"
-	"server/web/auth"
-	"server/web/blocker"
-	"server/web/pages"
-	"server/web/sslcerts"
-
-	swaggerFiles "github.com/swaggo/files"     // swagger embed files
-	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 var (
@@ -47,17 +36,16 @@ var (
 // @externalDocs.description	OpenAPI
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func Start() {
-	log.TLogln("Start TorrServer " + version.Version + " torrent " + version.GetTorrentVersion())
+	log.Println("Start TorrServer " + version.Version + " torrent " + version.GetTorrentVersion())
 	ips := GetLocalIps()
 	if len(ips) > 0 {
-		log.TLogln("Local IPs:", ips)
+		log.Println("Local IPs:", ips)
 	}
 	err := BTS.Connect()
 	if err != nil {
-		log.TLogln("BTS.Connect() error!", err) // waitChan <- err
+		log.Println("BTS.Connect() error!", err) // waitChan <- err
 		os.Exit(1)                              // return
 	}
-	rutor.Start()
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -71,46 +59,14 @@ func Start() {
 	corsCfg.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "X-Requested-With", "Accept", "Authorization"}
 
 	route := gin.New()
-	route.Use(log.WebLogger(), blocker.Blocker(), gin.Recovery(), cors.New(corsCfg), location.Default())
-	auth.SetupAuth(route)
+	route.Use(gin.Recovery(), cors.New(corsCfg), location.Default())
 
 	route.GET("/echo", echo)
 
 	api.SetupRoute(route)
-	msx.SetupRoute(route)
-	pages.SetupRoute(route)
-
-	if settings.BTsets.EnableDLNA {
-		dlna.Start()
-	}
-
-	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// check if https enabled
-	if settings.Ssl {
-		// if no cert and key files set in db/settings, generate new self-signed cert and key files
-		if settings.BTsets.SslCert == "" || settings.BTsets.SslKey == "" {
-			settings.BTsets.SslCert, settings.BTsets.SslKey = sslcerts.MakeCertKeyFiles(ips)
-			log.TLogln("Saving path to ssl cert and key in db", settings.BTsets.SslCert, settings.BTsets.SslKey)
-			settings.SetBTSets(settings.BTsets)
-		}
-		// verify if cert and key files are valid
-		err = sslcerts.VerifyCertKeyFiles(settings.BTsets.SslCert, settings.BTsets.SslKey, settings.SslPort)
-		// if not valid, generate new self-signed cert and key files
-		if err != nil {
-			log.TLogln("Error checking certificate and private key files:", err)
-			settings.BTsets.SslCert, settings.BTsets.SslKey = sslcerts.MakeCertKeyFiles(ips)
-			log.TLogln("Saving path to ssl cert and key in db", settings.BTsets.SslCert, settings.BTsets.SslKey)
-			settings.SetBTSets(settings.BTsets)
-		}
-		go func() {
-			log.TLogln("Start https server at", settings.IP+":"+settings.SslPort)
-			waitChan <- route.RunTLS(settings.IP+":"+settings.SslPort, settings.BTsets.SslCert, settings.BTsets.SslKey)
-		}()
-	}
 
 	go func() {
-		log.TLogln("Start http server at", settings.IP+":"+settings.Port)
+		log.Println("Start http server at", settings.IP+":"+settings.Port)
 		waitChan <- route.Run(settings.IP + ":" + settings.Port)
 	}()
 }
@@ -120,7 +76,6 @@ func Wait() error {
 }
 
 func Stop() {
-	dlna.Stop()
 	BTS.Disconnect()
 	waitChan <- nil
 }
@@ -142,7 +97,7 @@ func echo(c *gin.Context) {
 func GetLocalIps() []string {
 	ifaces, err := anet.Interfaces()
 	if err != nil {
-		log.TLogln("Error get local IPs")
+		log.Println("Error get local IPs")
 		return nil
 	}
 	var list []string

@@ -2,9 +2,9 @@ package utils
 
 import (
 	"bufio"
+	"log"
 	"os"
 	"path/filepath"
-	"server/log"
 	"strings"
 
 	"server/settings"
@@ -17,7 +17,7 @@ func ReadBlockedIP() (ranger iplist.Ranger, err error) {
 	if err != nil {
 		return nil, err
 	}
-	log.TLogln("Read block list...")
+	log.Println("Read block list...")
 	scanner := bufio.NewScanner(strings.NewReader(string(buf)))
 	var ranges []iplist.Range
 	for scanner.Scan() {
@@ -32,7 +32,7 @@ func ReadBlockedIP() (ranger iplist.Ranger, err error) {
 	err = scanner.Err()
 	if len(ranges) > 0 {
 		ranger = iplist.New(ranges)
-		log.TLogln("Readed ranges:", len(ranges))
+		log.Println("Readed ranges:", len(ranges))
 	}
 	return
 }

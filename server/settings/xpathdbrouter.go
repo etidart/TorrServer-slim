@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"server/log"
+	"log"
 
 	"golang.org/x/exp/slices"
 )
@@ -111,8 +111,8 @@ func (v *XPathDBRouter) getDBName(db TorrServerDB) string {
 
 func (v *XPathDBRouter) log(s string, params ...interface{}) {
 	if len(params) > 0 {
-		log.TLogln(fmt.Sprintf("XPathDBRouter: %s: %s", s, fmt.Sprint(params...)))
+		log.Printf("XPathDBRouter: %s: %s", s, fmt.Sprint(params...))
 	} else {
-		log.TLogln(fmt.Sprintf("XPathDBRouter: %s", s))
+		log.Printf("XPathDBRouter: %s", s)
 	}
 }

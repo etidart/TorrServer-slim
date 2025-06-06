@@ -9,7 +9,7 @@ import (
 
 	"github.com/anacrolix/torrent"
 
-	"server/log"
+	"log"
 	"server/settings"
 	"server/torr/storage/state"
 	"server/torr/utils"
@@ -53,7 +53,7 @@ func NewCache(capacity int64, storage *Storage) *Cache {
 }
 
 func (c *Cache) Init(info *metainfo.Info, hash metainfo.Hash) {
-	log.TLogln("Create cache for:", info.Name, hash.HexString())
+	log.Println("Create cache for:", info.Name, hash.HexString())
 	if c.capacity == 0 {
 		c.capacity = info.PieceLength * 4
 	}
@@ -66,7 +66,7 @@ func (c *Cache) Init(info *metainfo.Info, hash metainfo.Hash) {
 		name := filepath.Join(settings.BTsets.TorrentsSavePath, hash.HexString())
 		err := os.MkdirAll(name, 0o777)
 		if err != nil {
-			log.TLogln("Error create dir:", err)
+			log.Println("Error create dir:", err)
 		}
 	}
 
@@ -87,7 +87,7 @@ func (c *Cache) Piece(m metainfo.Piece) storage.PieceImpl {
 }
 
 func (c *Cache) Close() error {
-	log.TLogln("Close cache for:", c.hash)
+	log.Println("Close cache for:", c.hash)
 	c.isClosed = true
 
 	delete(c.storage.caches, c.hash)

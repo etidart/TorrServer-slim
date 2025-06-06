@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -15,11 +16,8 @@ import (
 	"github.com/anacrolix/torrent/metainfo"
 
 	"github.com/alexflint/go-arg"
-	"github.com/pkg/browser"
 
 	"server"
-	"server/docs"
-	"server/log"
 	"server/settings"
 	"server/torr"
 	"server/version"
@@ -28,24 +26,13 @@ import (
 type args struct {
 	Port        string `arg:"-p" help:"web server port (default 8090)"`
 	IP          string `arg:"-i" help:"web server addr (default empty)"`
-	Ssl         bool   `help:"enables https"`
-	SslPort     string `help:"web server ssl port, If not set, will be set to default 8091 or taken from db(if stored previously). Accepted if --ssl enabled."`
-	SslCert     string `help:"path to ssl cert file. If not set, will be taken from db(if stored previously) or default self-signed certificate/key will be generated. Accepted if --ssl enabled."`
-	SslKey      string `help:"path to ssl key file. If not set, will be taken from db(if stored previously) or default self-signed certificate/key will be generated. Accepted if --ssl enabled."`
 	Path        string `arg:"-d" help:"database and config dir path"`
-	LogPath     string `arg:"-l" help:"server log file path"`
-	WebLogPath  string `arg:"-w" help:"web access log file path"`
 	RDB         bool   `arg:"-r" help:"start in read-only DB mode"`
-	HttpAuth    bool   `arg:"-a" help:"enable http auth on all requests"`
-	DontKill    bool   `arg:"-k" help:"don't kill server on signal"`
-	UI          bool   `arg:"-u" help:"open torrserver page in browser"`
 	TorrentsDir string `arg:"-t" help:"autoload torrents from dir"`
 	TorrentAddr string `help:"Torrent client address, like 127.0.0.1:1337 (default :PeersListenPort)"`
 	PubIPv4     string `arg:"-4" help:"set public IPv4 addr"`
 	PubIPv6     string `arg:"-6" help:"set public IPv6 addr"`
-	SearchWA    bool   `arg:"-s" help:"search without auth"`
 	MaxSize     string `arg:"-m" help:"max allowed stream size (in Bytes)"`
-	TGToken     string `arg:"-T" help:"telegram bot token"`
 }
 
 func (args) Version() string {
@@ -68,31 +55,14 @@ func main() {
 	}
 
 	settings.Path = params.Path
-	settings.HttpAuth = params.HttpAuth
-	log.Init(params.LogPath, params.WebLogPath)
 	fmt.Println("=========== START ===========")
 	fmt.Println("TorrServer", version.Version+",", runtime.Version()+",", "CPU Num:", runtime.NumCPU())
-	if params.HttpAuth {
-		log.TLogln("Use HTTP Auth file", settings.Path+"/accs.db")
-	}
+
 	if params.RDB {
-		log.TLogln("Running in Read-only DB mode!")
+		log.Println("Running in Read-only DB mode!")
 	}
-	docs.SwaggerInfo.Version = version.Version
 
 	dnsResolve()
-	Preconfig(params.DontKill)
-
-	if params.UI {
-		go func() {
-			time.Sleep(time.Second)
-			if params.Ssl {
-				browser.OpenURL("https://127.0.0.1:" + params.SslPort)
-			} else {
-				browser.OpenURL("http://127.0.0.1:" + params.Port)
-			}
-		}()
-	}
 
 	if params.TorrentAddr != "" {
 		settings.TorAddr = params.TorrentAddr
@@ -117,9 +87,8 @@ func main() {
 		}
 	}
 
-	server.Start(params.Port, params.IP, params.SslPort, params.SslCert, params.SslKey, params.Ssl, params.RDB, params.SearchWA, params.TGToken)
-	log.TLogln(server.WaitServer())
-	log.Close()
+	server.Start(params.Port, params.IP, params.RDB)
+	log.Println(server.WaitServer())
 	time.Sleep(time.Second * 3)
 	os.Exit(0)
 }
@@ -127,7 +96,7 @@ func main() {
 func dnsResolve() {
 	addrs, err := net.LookupHost("www.google.com")
 	if len(addrs) == 0 {
-		log.TLogln("Check dns failed", addrs, err)
+		log.Println("Check dns failed", addrs, err)
 
 		fn := func(ctx context.Context, network, address string) (net.Conn, error) {
 			d := net.Dialer{}
@@ -139,9 +108,9 @@ func dnsResolve() {
 		}
 
 		addrs, err = net.LookupHost("www.google.com")
-		log.TLogln("Check cloudflare dns", addrs, err)
+		log.Println("Check cloudflare dns", addrs, err)
 	} else {
-		log.TLogln("Check dns OK", addrs, err)
+		log.Println("Check dns OK", addrs, err)
 	}
 }
 
@@ -170,18 +139,18 @@ func watchTDir(dir string) {
 								os.Remove(filename)
 								time.Sleep(time.Second)
 							} else {
-								log.TLogln("Error get info from torrent")
+								log.Println("Error get info from torrent")
 							}
 						} else {
-							log.TLogln("Error parse torrent file:", err)
+							log.Println("Error parse torrent file:", err)
 						}
 					} else {
-						log.TLogln("Error parse file name:", err)
+						log.Println("Error parse file name:", err)
 					}
 				}
 			}
 		} else {
-			log.TLogln("Error read dir:", err)
+			log.Println("Error read dir:", err)
 		}
 		time.Sleep(time.Second * 5)
 	}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/anacrolix/torrent"
 
-	"server/log"
+	"log"
 	"server/settings"
 )
 
@@ -90,7 +90,7 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 		r.offset += int64(n)
 		r.lastAccess = time.Now().Unix()
 	} else {
-		log.TLogln("Torrent closed and readed")
+		log.Println("Torrent closed and readed")
 	}
 	return
 }

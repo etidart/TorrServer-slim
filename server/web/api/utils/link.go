@@ -50,13 +50,13 @@ func ParseLink(link string) (*torrent.TorrentSpec, error) {
 	case "file":
 		return fromFile(urlLink.Path)
 	default:
-		err = fmt.Errorf("unknown scheme:", urlLink, urlLink.Scheme)
+		err = fmt.Errorf("unknown scheme: %s %s", urlLink, urlLink.Scheme)
 	}
 	return nil, err
 }
 
 func fromMagnet(link string) (*torrent.TorrentSpec, error) {
-	mag, err := metainfo.ParseMagnetURI(link)
+	mag, err := metainfo.ParseMagnetUri(link)
 	if err != nil {
 		return nil, err
 	}

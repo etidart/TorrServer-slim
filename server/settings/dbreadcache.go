@@ -3,7 +3,7 @@ package settings
 import (
 	"sync"
 
-	"server/log"
+	"log"
 )
 
 type DBReadCache struct {
@@ -47,7 +47,7 @@ func (v *DBReadCache) Get(xPath, name string) []byte {
 
 func (v *DBReadCache) Set(xPath, name string, value []byte) {
 	if ReadOnly {
-		log.TLogln("DB.Set: Read-only DB mode!", name)
+		log.Println("DB.Set: Read-only DB mode!", name)
 		return
 	}
 	cacheKey := v.makeDataCacheKey(xPath, name)
@@ -74,7 +74,7 @@ func (v *DBReadCache) List(xPath string) []string {
 
 func (v *DBReadCache) Rem(xPath, name string) {
 	if ReadOnly {
-		log.TLogln("DB.Rem: Read-only DB mode!", name)
+		log.Println("DB.Rem: Read-only DB mode!", name)
 		return
 	}
 	cacheKey := v.makeDataCacheKey(xPath, name)

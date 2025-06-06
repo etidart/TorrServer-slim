@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"server/log"
+	"log"
 )
 
 type JsonDB struct {
@@ -109,8 +109,8 @@ func (v *JsonDB) Rem(xPath, name string) {
 }
 
 func (v *JsonDB) lock(filename string) {
-	var mtx sync.Mutex
-	if mtx, ok := jsonDbLocks[filename]; !ok {
+	mtx, ok := jsonDbLocks[filename]
+	if !ok {
 		mtx = new(sync.Mutex)
 		jsonDbLocks[v.Path] = mtx
 	}
@@ -155,8 +155,8 @@ func (v *JsonDB) writeMapAsJsonFile(filename string, o map[string]interface{}) e
 
 func (v *JsonDB) log(s string, params ...interface{}) {
 	if len(params) > 0 {
-		log.TLogln(fmt.Sprintf("JsonDB: %s: %s", s, fmt.Sprint(params...)))
+		log.Printf("JsonDB: %s: %s\n", s, fmt.Sprint(params...))
 	} else {
-		log.TLogln(fmt.Sprintf("JsonDB: %s", s))
+		log.Printf("JsonDB: %s\n", s)
 	}
 }

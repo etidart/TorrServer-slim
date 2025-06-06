@@ -1,29 +1,22 @@
 package api
 
-import (
-	config "server/settings"
-	"server/web/auth"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 type requestI struct {
 	Action string `json:"action,omitempty"`
 }
 
 func SetupRoute(route gin.IRouter) {
-	authorized := route.Group("/", auth.CheckAuth())
+	route.GET("/shutdown", shutdown)
+	route.GET("/shutdown/*reason", shutdown)
 
-	authorized.GET("/shutdown", shutdown)
-	authorized.GET("/shutdown/*reason", shutdown)
+	route.POST("/settings", settings)
 
-	authorized.POST("/settings", settings)
+	route.POST("/torrents", torrents)
 
-	authorized.POST("/torrents", torrents)
+	route.POST("/torrent/upload", torrentUpload)
 
-	authorized.POST("/torrent/upload", torrentUpload)
-
-	authorized.POST("/cache", cache)
+	route.POST("/cache", cache)
 
 	route.HEAD("/stream", stream)
 	route.GET("/stream", stream)
@@ -34,20 +27,12 @@ func SetupRoute(route gin.IRouter) {
 	route.HEAD("/play/:hash/:id", play)
 	route.GET("/play/:hash/:id", play)
 
-	authorized.POST("/viewed", viewed)
+	route.POST("/viewed", viewed)
 
-	authorized.GET("/playlistall/all.m3u", allPlayList)
+	route.GET("/playlistall/all.m3u", allPlayList)
 
 	route.GET("/playlist", playList)
 	route.GET("/playlist/*fname", playList)
 
-	authorized.GET("/download/:size", download)
-
-	if config.SearchWA {
-		route.GET("/search/*query", rutorSearch)
-	} else {
-		authorized.GET("/search/*query", rutorSearch)
-	}
-
-	authorized.GET("/ffp/:hash/:id", ffp)
+	route.GET("/download/:size", download)
 }

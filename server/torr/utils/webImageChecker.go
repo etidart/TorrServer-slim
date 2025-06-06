@@ -10,7 +10,7 @@ import (
 
 	"golang.org/x/image/webp"
 
-	"server/log"
+	"log"
 )
 
 func CheckImgUrl(link string) bool {
@@ -19,7 +19,7 @@ func CheckImgUrl(link string) bool {
 	}
 	resp, err := http.Get(link)
 	if err != nil {
-		log.TLogln("Error check image:", err)
+		log.Println("Error check image:", err)
 		return false
 	}
 	defer resp.Body.Close()
@@ -29,7 +29,7 @@ func CheckImgUrl(link string) bool {
 		_, _, err = image.Decode(resp.Body)
 	}
 	if err != nil {
-		log.TLogln("Error decode image:", err)
+		log.Println("Error decode image:", err)
 		return false
 	}
 	return err == nil

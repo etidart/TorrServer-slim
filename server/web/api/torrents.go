@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"server/dlna"
-	"server/log"
+	"log"
 	set "server/settings"
 	"server/torr"
 	"server/torr/state"
@@ -86,11 +85,11 @@ func addTorrent(req torrReqJS, c *gin.Context) {
 		return
 	}
 
-	log.TLogln("add torrent", req.Link)
+	log.Println("add torrent", req.Link)
 	req.Link = strings.ReplaceAll(req.Link, "&amp;", "&")
 	torrSpec, err := utils.ParseLink(req.Link)
 	if err != nil {
-		log.TLogln("error parse link:", err)
+		log.Println("error parse link:", err)
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -98,21 +97,21 @@ func addTorrent(req torrReqJS, c *gin.Context) {
 	tor, err := torr.AddTorrent(torrSpec, req.Title, req.Poster, req.Data, req.Category)
 
 	if tor.Data != "" && set.BTsets.EnableDebug {
-		log.TLogln("torrent data:", tor.Data)
+		log.Println("torrent data:", tor.Data)
 	}
 	if tor.Category != "" && set.BTsets.EnableDebug {
-		log.TLogln("torrent category:", tor.Category)
+		log.Println("torrent category:", tor.Category)
 	}
 
 	if err != nil {
-		log.TLogln("error add torrent:", err)
+		log.Println("error add torrent:", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
 	go func() {
 		if !tor.GotInfo() {
-			log.TLogln("error add torrent:", "timeout connection get torrent info")
+			log.Println("error add torrent:", "timeout connection get torrent info")
 			return
 		}
 
@@ -130,11 +129,6 @@ func addTorrent(req torrReqJS, c *gin.Context) {
 			torr.SaveTorrentToDB(tor)
 		}
 	}()
-	// TODO: remove
-	if set.BTsets.EnableDLNA {
-		dlna.Stop()
-		dlna.Start()
-	}
 	c.JSON(200, tor.Status())
 }
 
@@ -168,11 +162,6 @@ func remTorrent(req torrReqJS, c *gin.Context) {
 		return
 	}
 	torr.RemTorrent(req.Hash)
-	// TODO: remove
-	if set.BTsets.EnableDLNA {
-		dlna.Stop()
-		dlna.Start()
-	}
 	c.Status(200)
 }
 
@@ -202,11 +191,6 @@ func wipeTorrents(c *gin.Context) {
 	torrents := torr.ListTorrent()
 	for _, t := range torrents {
 		torr.RemTorrent(t.TorrentSpec.InfoHash.HexString())
-	}
-	// TODO: remove (copied todo from remTorrent())
-	if set.BTsets.EnableDLNA {
-		dlna.Stop()
-		dlna.Start()
 	}
 	c.Status(200)
 }

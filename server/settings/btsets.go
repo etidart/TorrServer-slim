@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"server/log"
+	"log"
 )
 
 type BTSets struct {
@@ -103,7 +103,7 @@ func SetBTSets(sets *BTSets) {
 			}
 			if d.IsDir() && strings.ToLower(d.Name()) == ".tsc" {
 				BTsets.TorrentsSavePath = path
-				log.TLogln("Find directory \"" + BTsets.TorrentsSavePath + "\", use as cache dir")
+				log.Println("Find directory \"" + BTsets.TorrentsSavePath + "\", use as cache dir")
 				return io.EOF
 			}
 			if d.IsDir() && strings.HasPrefix(d.Name(), ".") {
@@ -116,7 +116,7 @@ func SetBTSets(sets *BTSets) {
 	BTsets = sets
 	buf, err := json.Marshal(BTsets)
 	if err != nil {
-		log.TLogln("Error marshal btsets", err)
+		log.Println("Error marshal btsets", err)
 		return
 	}
 	tdb.Set("Settings", "BitTorr", buf)
@@ -134,7 +134,7 @@ func SetDefaultConfig() {
 	if !ReadOnly {
 		buf, err := json.Marshal(BTsets)
 		if err != nil {
-			log.TLogln("Error marshal btsets", err)
+			log.Println("Error marshal btsets", err)
 			return
 		}
 		tdb.Set("Settings", "BitTorr", buf)
@@ -151,7 +151,7 @@ func loadBTSets() {
 			}
 			return
 		}
-		log.TLogln("Error unmarshal btsets", err)
+		log.Println("Error unmarshal btsets", err)
 	}
 	// initialize defaults on error
 	SetDefaultConfig()

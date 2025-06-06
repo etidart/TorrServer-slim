@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"server/log"
+	"log"
 	"server/settings"
 )
 
@@ -37,7 +37,7 @@ func (p *DiskPiece) WriteAt(b []byte, off int64) (n int, err error) {
 
 	ff, err := os.OpenFile(p.name, os.O_RDWR|os.O_CREATE, 0o666)
 	if err != nil {
-		log.TLogln("Error open file:", err)
+		log.Println("Error open file:", err)
 		return 0, err
 	}
 	defer ff.Close()
@@ -60,7 +60,7 @@ func (p *DiskPiece) ReadAt(b []byte, off int64) (n int, err error) {
 		return 0, io.EOF
 	}
 	if err != nil {
-		log.TLogln("Error open file:", err)
+		log.Println("Error open file:", err)
 		return 0, err
 	}
 	defer ff.Close()

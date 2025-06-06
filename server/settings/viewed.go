@@ -3,7 +3,7 @@ package settings
 import (
 	"encoding/json"
 
-	"server/log"
+	"log"
 )
 
 type Viewed struct {
@@ -34,7 +34,7 @@ func SetViewed(vv *Viewed) {
 		}
 	}
 	if err != nil {
-		log.TLogln("Error set viewed:", err)
+		log.Println("Error set viewed:", err)
 	}
 }
 
@@ -54,7 +54,7 @@ func RemViewed(vv *Viewed) {
 		}
 	}
 	if err != nil {
-		log.TLogln("Error rem viewed:", err)
+		log.Println("Error rem viewed:", err)
 	}
 }
 
@@ -93,6 +93,6 @@ func ListViewed(hash string) []*Viewed {
 		return ret
 	}
 
-	log.TLogln("Error list viewed:", err)
+	log.Println("Error list viewed:", err)
 	return []*Viewed{}
 }

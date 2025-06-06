@@ -10,7 +10,6 @@ import (
 	"github.com/anacrolix/publicip"
 	"github.com/anacrolix/torrent"
 	"github.com/anacrolix/torrent/metainfo"
-	"github.com/wlynxg/anet"
 
 	"server/settings"
 	"server/torr/storage/torrstor"
@@ -211,56 +210,4 @@ func isPrivateIP(ip net.IP) bool {
 		}
 	}
 	return false
-}
-
-func getPublicIp4() net.IP {
-	ifaces, err := anet.Interfaces()
-	if err != nil {
-		log.Println("Error get public IPv4")
-		return nil
-	}
-	for _, i := range ifaces {
-		addrs, _ := anet.InterfaceAddrsByInterface(&i)
-		if i.Flags&net.FlagUp == net.FlagUp {
-			for _, addr := range addrs {
-				var ip net.IP
-				switch v := addr.(type) {
-				case *net.IPNet:
-					ip = v.IP
-				case *net.IPAddr:
-					ip = v.IP
-				}
-				if !isPrivateIP(ip) && ip.To4() != nil {
-					return ip
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func getPublicIp6() net.IP {
-	ifaces, err := anet.Interfaces()
-	if err != nil {
-		log.Println("Error get public IPv6")
-		return nil
-	}
-	for _, i := range ifaces {
-		addrs, _ := anet.InterfaceAddrsByInterface(&i)
-		if i.Flags&net.FlagUp == net.FlagUp {
-			for _, addr := range addrs {
-				var ip net.IP
-				switch v := addr.(type) {
-				case *net.IPNet:
-					ip = v.IP
-				case *net.IPAddr:
-					ip = v.IP
-				}
-				if !isPrivateIP(ip) && ip.To16() != nil && ip.To4() == nil {
-					return ip
-				}
-			}
-		}
-	}
-	return nil
 }

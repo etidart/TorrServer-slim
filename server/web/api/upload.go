@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"server/log"
+	"log"
 	set "server/settings"
 	"server/torr"
 	"server/web/api/utils"
@@ -57,38 +57,38 @@ func torrentUpload(c *gin.Context) {
 	}
 	var tor *torr.Torrent
 	for name, file := range form.File {
-		log.TLogln("add .torrent", name)
+		log.Println("add .torrent", name)
 
 		torrFile, err := file[0].Open()
 		if err != nil {
-			log.TLogln("error upload torrent:", err)
+			log.Println("error upload torrent:", err)
 			continue
 		}
 		defer torrFile.Close()
 
 		spec, err := utils.ParseFile(torrFile)
 		if err != nil {
-			log.TLogln("error upload torrent:", err)
+			log.Println("error upload torrent:", err)
 			continue
 		}
 
 		tor, err = torr.AddTorrent(spec, title, poster, data, category)
 
 		if tor.Data != "" && set.BTsets.EnableDebug {
-			log.TLogln("torrent data:", tor.Data)
+			log.Println("torrent data:", tor.Data)
 		}
 		if tor.Category != "" && set.BTsets.EnableDebug {
-			log.TLogln("torrent category:", tor.Category)
+			log.Println("torrent category:", tor.Category)
 		}
 
 		if err != nil {
-			log.TLogln("error upload torrent:", err)
+			log.Println("error upload torrent:", err)
 			continue
 		}
 
 		go func() {
 			if !tor.GotInfo() {
-				log.TLogln("error add torrent:", "timeout connection torrent")
+				log.Println("error add torrent:", "timeout connection torrent")
 				return
 			}
 
