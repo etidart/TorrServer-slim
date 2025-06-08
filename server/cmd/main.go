@@ -161,17 +161,16 @@ func openFile(path string) (*torrent.TorrentSpec, error) {
 	if err != nil {
 		return nil, err
 	}
-	info, err := minfo.UnmarshalInfo()
+
+	mag, err := minfo.MagnetV2()
 	if err != nil {
 		return nil, err
 	}
 
-	// mag := minfo.Magnet(info.Name, minfo.HashInfoBytes())
-	mag := minfo.Magnet(nil, &info)
 	return &torrent.TorrentSpec{
 		InfoBytes:   minfo.InfoBytes,
 		Trackers:    [][]string{mag.Trackers},
-		DisplayName: info.Name,
+		DisplayName: mag.DisplayName,
 		InfoHash:    minfo.HashInfoBytes(),
 	}, nil
 }

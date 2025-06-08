@@ -40,7 +40,7 @@ func (v *JsonDB) CloseDB() {
 
 func (v *JsonDB) Set(xPath, name string, value []byte) {
 	var err error = nil
-	jsonObj := map[string]interface{}{}
+	jsonObj := map[string]any{}
 	if err := json.Unmarshal(value, &jsonObj); err == nil {
 		if filename, err := v.xPathToFilename(xPath); err == nil {
 			v.lock(filename)
@@ -130,9 +130,9 @@ func (v *JsonDB) xPathToFilename(xPath string) (string, error) {
 	return "", errors.New("xPath has no components")
 }
 
-func (v *JsonDB) readJsonFileAsMap(filename string) (map[string]interface{}, error) {
+func (v *JsonDB) readJsonFileAsMap(filename string) (map[string]any, error) {
 	var err error = nil
-	jsonData := map[string]interface{}{}
+	jsonData := map[string]any{}
 	path := filepath.Join(v.Path, filename)
 	if fileData, err := os.ReadFile(path); err == nil {
 		if err = json.Unmarshal(fileData, &jsonData); err != nil {
@@ -142,7 +142,7 @@ func (v *JsonDB) readJsonFileAsMap(filename string) (map[string]interface{}, err
 	return jsonData, err
 }
 
-func (v *JsonDB) writeMapAsJsonFile(filename string, o map[string]interface{}) error {
+func (v *JsonDB) writeMapAsJsonFile(filename string, o map[string]any) error {
 	var err error = nil
 	path := filepath.Join(v.Path, filename)
 	if fileData, err := json.MarshalIndent(o, "", "  "); err == nil {
@@ -153,7 +153,7 @@ func (v *JsonDB) writeMapAsJsonFile(filename string, o map[string]interface{}) e
 	return err
 }
 
-func (v *JsonDB) log(s string, params ...interface{}) {
+func (v *JsonDB) log(s string, params ...any) {
 	if len(params) > 0 {
 		log.Printf("JsonDB: %s: %s\n", s, fmt.Sprint(params...))
 	} else {

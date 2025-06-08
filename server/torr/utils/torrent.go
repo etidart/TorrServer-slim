@@ -91,10 +91,7 @@ func PeerIDRandom(peer string) string {
 func Limit(i int) *rate.Limiter {
 	l := rate.NewLimiter(rate.Inf, 0)
 	if i > 0 {
-		b := i
-		if b < 16*1024 {
-			b = 16 * 1024
-		}
+		b := max(i, 16 * 1024)
 		l = rate.NewLimiter(rate.Limit(i), b)
 	}
 	return l

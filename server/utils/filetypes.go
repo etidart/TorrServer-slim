@@ -7,7 +7,7 @@ import (
 	"server/torr/state"
 )
 
-var extVideo = map[string]interface{}{
+var extVideo = map[string]any{
 	".3g2":   nil,
 	".3gp":   nil,
 	".aaf":   nil,
@@ -46,7 +46,7 @@ var extVideo = map[string]interface{}{
 	".yuv":   nil,
 }
 
-var extAudio = map[string]interface{}{
+var extAudio = map[string]any{
 	".aac":  nil,
 	".aiff": nil,
 	".ape":  nil,

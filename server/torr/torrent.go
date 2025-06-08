@@ -85,10 +85,7 @@ func NewTorrent(spec *torrent.TorrentSpec, bt *BTServer) (*Torrent, error) {
 		return tor, nil
 	}
 
-	timeout := time.Second * time.Duration(settings.BTsets.TorrentDisconnectTimeout)
-	if timeout > time.Minute {
-		timeout = time.Minute
-	}
+	timeout := min(time.Second * time.Duration(settings.BTsets.TorrentDisconnectTimeout), time.Minute)
 
 	torr := new(Torrent)
 	torr.Torrent = goTorrent

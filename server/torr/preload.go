@@ -56,10 +56,7 @@ func (t *Torrent) Preload(index int, size int64) {
 	}
 
 	if t.Info() != nil {
-		timeout := time.Second * time.Duration(settings.BTsets.TorrentDisconnectTimeout)
-		if timeout > time.Minute {
-			timeout = time.Minute
-		}
+		timeout := min(time.Second * time.Duration(settings.BTsets.TorrentDisconnectTimeout), time.Minute)
 		// Запуск лога в отдельном потоке
 		go func() {
 			for t.Stat == state.TorrentPreload {
@@ -76,10 +73,7 @@ func (t *Torrent) Preload(index int, size int64) {
 		}
 
 		// startend -> 8/16 MB
-		startend := t.Info().PieceLength
-		if startend < 8<<20 {
-			startend = 8 << 20
-		}
+		startend := max(t.Info().PieceLength, 8 << 20)
 
 		readerStart := file.NewReader()
 		defer readerStart.Close()

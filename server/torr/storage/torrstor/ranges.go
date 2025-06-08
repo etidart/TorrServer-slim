@@ -3,6 +3,8 @@ package torrstor
 import (
 	"sort"
 
+	"slices"
+
 	"github.com/anacrolix/torrent"
 )
 
@@ -25,7 +27,7 @@ func mergeRange(ranges []Range) []Range {
 		return ranges
 	}
 	// copy ranges
-	merged := append([]Range(nil), ranges...)
+	merged := slices.Clone(ranges)
 
 	sort.Slice(merged, func(i, j int) bool {
 		if merged[i].Start < merged[j].Start {

@@ -70,7 +70,7 @@ func (c *Cache) Init(info *metainfo.Info, hash metainfo.Hash) {
 		}
 	}
 
-	for i := 0; i < c.pieceCount; i++ {
+	for i := range c.pieceCount {
 		c.pieces[i] = NewPiece(i, c)
 	}
 }
@@ -287,10 +287,7 @@ func (c *Cache) setLoadPriority(ranges []Range) {
 
 func (c *Cache) isIdInFileBE(ranges []Range, id int) bool {
 	// keep 8/16 MB
-	FileRangeNotDelete := int64(c.pieceLength)
-	if FileRangeNotDelete < 8<<20 {
-		FileRangeNotDelete = 8 << 20
-	}
+	FileRangeNotDelete := max(int64(c.pieceLength), 8 << 20)
 
 	for _, rng := range ranges {
 		ss := int(rng.File.Offset() / c.pieceLength)

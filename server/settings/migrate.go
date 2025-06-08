@@ -133,8 +133,8 @@ func MigrateToJson(bboltDB, jsonDB TorrServerDB) error {
 	}
 
 	isByteArraysEqualJson := func(a, b []byte) (bool, error) {
-		var objectA interface{}
-		var objectB interface{}
+		var objectA any
+		var objectB any
 		var err error = nil
 		if err = json.Unmarshal(a, &objectA); err == nil {
 			if err = json.Unmarshal(b, &objectB); err == nil {

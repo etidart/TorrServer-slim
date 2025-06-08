@@ -52,10 +52,7 @@ func Format(b float64) string {
 func CommonPrefix(first, second string) string {
 	var result strings.Builder
 
-	minLength := len(first)
-	if len(second) < minLength {
-		minLength = len(second)
-	}
+	minLength := min(len(second), len(first))
 
 	for i := 0; i < minLength; i++ {
 		if first[i] != second[i] {
@@ -70,7 +67,7 @@ func CommonPrefix(first, second string) string {
 func NumberPrefix(str string) (int, error) {
 	var result strings.Builder
 
-	for i := 0; i < len(str); i++ {
+	for i := range len(str) {
 		if !unicode.IsDigit(rune(str[i])) {
 			break
 		}
