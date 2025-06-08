@@ -93,8 +93,8 @@ func (bt *BTServer) configure(ctx context.Context) {
 	bt.config.DisableTCP = settings.BTsets.DisableTCP
 	bt.config.DisableUTP = settings.BTsets.DisableUTP
 	//	https://github.com/anacrolix/torrent/issues/703
-	// bt.config.DisableWebtorrent = true //	NE
-	// bt.config.DisableWebseeds = false  //	NE
+	bt.config.DisableWebtorrent = true //	NE
+	bt.config.DisableWebseeds = false  //	NE
 	bt.config.NoDefaultPortForwarding = settings.BTsets.DisableUPNP
 	bt.config.NoDHT = settings.BTsets.DisableDHT
 	bt.config.DisablePEX = settings.BTsets.DisablePEX
@@ -108,13 +108,13 @@ func (bt *BTServer) configure(ctx context.Context) {
 	bt.config.EstablishedConnsPerTorrent = settings.BTsets.ConnectionsLimit
 	bt.config.TotalHalfOpenConns = 500
 	// Encryption/Obfuscation
-	bt.config.EncryptionPolicy = torrent.EncryptionPolicy{ //	OE
-		ForceEncryption: settings.BTsets.ForceEncrypt, //	OE
-	} //	OE
-	// bt.config.HeaderObfuscationPolicy = torrent.HeaderObfuscationPolicy{ //	NE
-	// 	RequirePreferred: settings.BTsets.ForceEncrypt, //	NE
-	// 	Preferred:        true,                         //	NE
-	// } //	NE
+	// bt.config.EncryptionPolicy = torrent.EncryptionPolicy{ //	OE
+	//	ForceEncryption: settings.BTsets.ForceEncrypt, //	OE
+	// } //	OE
+	bt.config.HeaderObfuscationPolicy = torrent.HeaderObfuscationPolicy{ //	NE
+	 	RequirePreferred: settings.BTsets.ForceEncrypt, //	NE
+		Preferred:        true,                         //	NE
+	} //	NE
 	if settings.BTsets.DownloadRateLimit > 0 {
 		bt.config.DownloadRateLimiter = utils.Limit(settings.BTsets.DownloadRateLimit * 1024)
 	}
