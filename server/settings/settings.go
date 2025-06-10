@@ -10,8 +10,7 @@ import (
 var (
 	tdb      TorrServerDB
 	Path     string
-	IP       string
-	Port     string
+	LAddr    string
 	ReadOnly bool
 	PubIPv4  string
 	PubIPv6  string

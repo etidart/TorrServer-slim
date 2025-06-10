@@ -1,7 +1,9 @@
 package web
 
 import (
+	"net"
 	"os"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/location"
@@ -59,8 +61,17 @@ func Start() {
 	api.SetupRoute(route)
 
 	go func() {
-		log.Println("Start http server at", settings.IP+":"+settings.Port)
-		waitChan <- route.Run(settings.IP + ":" + settings.Port)
+		var l net.Listener
+		if strings.HasPrefix(settings.LAddr, "unix:") {
+			l, err = net.Listen("unix", settings.LAddr[5:])
+		} else {
+			l, err = net.Listen("tcp", settings.LAddr)
+		}
+		if err != nil {
+			log.Fatalln("Failed to bind on", settings.LAddr)
+		}
+		log.Println("Start http server at", settings.LAddr)
+		waitChan <- route.RunListener(l)
 	}()
 }
 

@@ -24,8 +24,7 @@ import (
 )
 
 type args struct {
-	Port        string `arg:"-p" help:"web server port (default 8090)"`
-	IP          string `arg:"-i" help:"web server addr (default empty)"`
+	LAddr       string `arg:"-l" help:"web server listen addr (can be unix:<path to socket>)" default:"localhost:8090"`
 	Path        string `arg:"-d" help:"database and config dir path"`
 	RDB         bool   `arg:"-r" help:"start in read-only DB mode"`
 	TorrentsDir string `arg:"-t" help:"autoload torrents from dir"`
@@ -48,10 +47,6 @@ func main() {
 
 	if params.Path == "" {
 		params.Path, _ = os.Getwd()
-	}
-
-	if params.Port == "" {
-		params.Port = "8090"
 	}
 
 	settings.Path = params.Path
@@ -87,7 +82,7 @@ func main() {
 		}
 	}
 
-	server.Start(params.Port, params.IP, params.RDB)
+	server.Start(params.LAddr, params.RDB)
 	log.Println(server.WaitServer())
 	time.Sleep(time.Second * 3)
 	os.Exit(0)
