@@ -7,8 +7,7 @@ The primary use case for TorrServer-slim is as a drop-in replacement for TorrSer
 ## How to use
 
 - Just launch the executable and get working service on `localhost:8090` (default).
-- On Linux systems with systemd you can install and enable `torrserver-slim.service` which will run program automatically on each startup.
-- In order to optimize resource usage with systemd, you can install `torrserver-slim.socket`, which utilizes systemd's functionality to launch service only when needed. Note that this will introduce a slight delay when starting the service after a period of inactivity.
+- On Linux systems with systemd you can install and enable `torrserver.service` which will run program automatically on each startup.
 
 ## Removed features
 
