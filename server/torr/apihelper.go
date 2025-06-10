@@ -3,7 +3,6 @@ package torr
 import (
 	"io"
 	"os"
-	"path/filepath"
 	"sort"
 	"time"
 
@@ -161,19 +160,6 @@ func RemTorrent(hashHex string) {
 		return
 	}
 	hash := metainfo.NewHashFromHex(hashHex)
-	if bts.RemoveTorrent(hash) {
-		if sets.BTsets.UseDisk && hashHex != "" && hashHex != "/" {
-			name := filepath.Join(sets.BTsets.TorrentsSavePath, hashHex)
-			ff, _ := os.ReadDir(name)
-			for _, f := range ff {
-				os.Remove(filepath.Join(name, f.Name()))
-			}
-			err := os.Remove(name)
-			if err != nil {
-				log.Println("Error remove cache:", err)
-			}
-		}
-	}
 	RemTorrentDB(hash)
 }
 

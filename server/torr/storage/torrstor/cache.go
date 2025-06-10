@@ -1,8 +1,6 @@
 package torrstor
 
 import (
-	"os"
-	"path/filepath"
 	"sort"
 	"sync"
 	"time"
@@ -62,14 +60,6 @@ func (c *Cache) Init(info *metainfo.Info, hash metainfo.Hash) {
 	c.pieceCount = info.NumPieces()
 	c.hash = hash
 
-	if settings.BTsets.UseDisk {
-		name := filepath.Join(settings.BTsets.TorrentsSavePath, hash.HexString())
-		err := os.MkdirAll(name, 0o777)
-		if err != nil {
-			log.Println("Error create dir:", err)
-		}
-	}
-
 	for i := range c.pieceCount {
 		c.pieces[i] = NewPiece(i, c)
 	}
@@ -91,18 +81,6 @@ func (c *Cache) Close() error {
 	c.isClosed = true
 
 	delete(c.storage.caches, c.hash)
-
-	if settings.BTsets.RemoveCacheOnDrop {
-		name := filepath.Join(settings.BTsets.TorrentsSavePath, c.hash.HexString())
-		if name != "" && name != "/" {
-			for _, v := range c.pieces {
-				if v.dPiece != nil {
-					os.Remove(v.dPiece.name)
-				}
-			}
-			os.Remove(name)
-		}
-	}
 
 	c.muReaders.Lock()
 	c.readers = nil

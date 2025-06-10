@@ -2,10 +2,6 @@ package settings
 
 import (
 	"encoding/json"
-	"io"
-	"io/fs"
-	"path/filepath"
-	"strings"
 
 	"log"
 )
@@ -16,23 +12,11 @@ type BTSets struct {
 	ReaderReadAHead int   // in percent, 5%-100%, [...S__X__E...] [S-E] not clean
 	PreloadCache    int   // in percent
 
-	// Disk
-	UseDisk           bool
-	TorrentsSavePath  string
-	RemoveCacheOnDrop bool
-
 	// Torrent
 	ForceEncrypt             bool
 	RetrackersMode           int  // 0 - don`t add, 1 - add retrackers (def), 2 - remove retrackers 3 - replace retrackers
 	TorrentDisconnectTimeout int  // in seconds
 	EnableDebug              bool // debug logs
-
-	// DLNA
-	EnableDLNA   bool
-	FriendlyName string
-
-	// Rutor
-	EnableRutorSearch bool
 
 	// BT Config
 	EnableIPv6        bool
@@ -46,11 +30,6 @@ type BTSets struct {
 	UploadRateLimit   int // in kb, 0 - inf
 	ConnectionsLimit  int
 	PeersListenPort   int
-
-	// HTTPS
-	SslPort int
-	SslCert string
-	SslKey  string
 
 	// Reader
 	ResponsiveMode bool // enable Responsive reader (don't wait pieceComplete)
@@ -90,27 +69,6 @@ func SetBTSets(sets *BTSets) {
 	}
 	if sets.PreloadCache > 100 {
 		sets.PreloadCache = 100
-	}
-
-	if sets.TorrentsSavePath == "" {
-		sets.UseDisk = false
-	} else if sets.UseDisk {
-		BTsets = sets
-
-		go filepath.WalkDir(sets.TorrentsSavePath, func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() && strings.ToLower(d.Name()) == ".tsc" {
-				BTsets.TorrentsSavePath = path
-				log.Println("Find directory \"" + BTsets.TorrentsSavePath + "\", use as cache dir")
-				return io.EOF
-			}
-			if d.IsDir() && strings.HasPrefix(d.Name(), ".") {
-				return filepath.SkipDir
-			}
-			return nil
-		})
 	}
 
 	BTsets = sets

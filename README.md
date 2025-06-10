@@ -20,6 +20,7 @@ The primary use case for TorrServer-slim is as a drop-in replacement for TorrSer
 - ffprobe
 - telegram bot
 - dlna server
+- disk as a piece storage
 
 ## License
 

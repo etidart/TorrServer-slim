@@ -67,7 +67,7 @@ func (t *Torrent) Stream(fileID int, req *http.Request, resp http.ResponseWriter
 	sets.SetViewed(&sets.Viewed{Hash: t.Hash().HexString(), FileIndex: fileID})
 
 	resp.Header().Set("Connection", "close")
-	etag := hex.EncodeToString([]byte(fmt.Sprintf("%s/%s", t.Hash().HexString(), file.Path())))
+	etag := hex.EncodeToString(fmt.Appendf(nil, "%s/%s", t.Hash().HexString(), file.Path()))
 	resp.Header().Set("ETag", httptoo.EncodeQuotedString(etag))
 
 	http.ServeContent(resp, req, file.Path(), time.Unix(t.Timestamp, 0), reader)
