@@ -1,14 +1,11 @@
 package web
 
 import (
-	"net"
 	"os"
-	"sort"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/location"
 	"github.com/gin-gonic/gin"
-	"github.com/wlynxg/anet"
 
 	"server/settings"
 
@@ -37,10 +34,6 @@ var (
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func Start() {
 	log.Println("Start TorrServer " + version.Version + " torrent " + version.GetTorrentVersion())
-	ips := GetLocalIps()
-	if len(ips) > 0 {
-		log.Println("Local IPs:", ips)
-	}
 	err := BTS.Connect()
 	if err != nil {
 		log.Println("BTS.Connect() error!", err) // waitChan <- err
@@ -92,32 +85,4 @@ func Stop() {
 //	@Router			/echo [get]
 func echo(c *gin.Context) {
 	c.String(200, "%v", version.Version)
-}
-
-func GetLocalIps() []string {
-	ifaces, err := anet.Interfaces()
-	if err != nil {
-		log.Println("Error get local IPs")
-		return nil
-	}
-	var list []string
-	for _, i := range ifaces {
-		addrs, _ := anet.InterfaceAddrsByInterface(&i)
-		if i.Flags&net.FlagUp == net.FlagUp {
-			for _, addr := range addrs {
-				var ip net.IP
-				switch v := addr.(type) {
-				case *net.IPNet:
-					ip = v.IP
-				case *net.IPAddr:
-					ip = v.IP
-				}
-				if !ip.IsLoopback() && !ip.IsLinkLocalUnicast() && !ip.IsLinkLocalMulticast() {
-					list = append(list, ip.String())
-				}
-			}
-		}
-	}
-	sort.Strings(list)
-	return list
 }
