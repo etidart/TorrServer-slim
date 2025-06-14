@@ -12,6 +12,7 @@ import (
 	"github.com/anacrolix/missinggo/v2/httptoo"
 	"github.com/anacrolix/torrent"
 
+	mt "server/mimetype"
 	sets "server/settings"
 	"server/torr/state"
 )
@@ -69,6 +70,8 @@ func (t *Torrent) Stream(fileID int, req *http.Request, resp http.ResponseWriter
 	resp.Header().Set("Connection", "close")
 	etag := hex.EncodeToString(fmt.Appendf(nil, "%s/%s", t.Hash().HexString(), file.Path()))
 	resp.Header().Set("ETag", httptoo.EncodeQuotedString(etag))
+
+	resp.Header().Set("Content-Type", mt.MimeTypeByPath(file.Path()).String())
 
 	http.ServeContent(resp, req, file.Path(), time.Unix(t.Timestamp, 0), reader)
 

@@ -3,8 +3,6 @@ package mimetype
 import (
 	"log"
 	"mime"
-	"net/http"
-	"os"
 	"path"
 	"strings"
 )
@@ -100,20 +98,9 @@ func (mt mimeType) String() string {
 }
 
 // MimeTypeByPath determines the MIME-type of file at the given path
-func MimeTypeByPath(filePath string) (ret mimeType, err error) {
+func MimeTypeByPath(filePath string) (ret mimeType) {
 	ret = mimeTypeByBaseName(path.Base(filePath))
 	if ret == "" {
-		ret, err = mimeTypeByContent(filePath)
-	}
-	// Custom DLNA-compat mime mappings
-	// TODO: make this depend on client headers / profile map
-	if ret == "video/mp2t" {
-		ret = "video/mpeg"
-		//	} else if ret == "video/x-matroska" {
-		//		ret = "video/mpeg"
-	} else if ret == "video/x-msvideo" {
-		ret = "video/avi"
-	} else if ret == "" {
 		ret = "application/octet-stream"
 	}
 	return
@@ -127,18 +114,4 @@ func mimeTypeByBaseName(name string) mimeType {
 		return mimeType(mime.TypeByExtension(ext))
 	}
 	return mimeType("")
-}
-
-// Guess the MIME-type by analysing the first 512 bytes of the file.
-func mimeTypeByContent(path string) (ret mimeType, err error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-	var data [512]byte
-	if n, err := file.Read(data[:]); err == nil {
-		ret = mimeType(http.DetectContentType(data[:n]))
-	}
-	return
 }
