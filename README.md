@@ -9,6 +9,14 @@ The primary use case for TorrServer-slim is as a drop-in replacement for TorrSer
 - Just launch the executable and get working service on `localhost:8090` (default).
 - On Linux systems with systemd you can install and enable `torrserver.service` which will run program automatically on each startup.
 
+### Interaction with the service
+
+Developer of this fork recommends 3 options:
+
+- using the original web panel (it is not included in this fork)
+- using python script `torrservercli.py` (not all api endpoints are implemented)
+- using other web frontends (such as lampa)
+
 ## Removed features
 
 - web frontend
