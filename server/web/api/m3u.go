@@ -104,7 +104,7 @@ func sendM3U(c *gin.Context, name, hash string, m3u string) {
 	c.Header("Content-Type", "audio/x-mpegurl")
 	c.Header("Connection", "close")
 	if hash != "" {
-		etag := hex.EncodeToString([]byte(fmt.Sprintf("%s/%s", hash, name)))
+		etag := hex.EncodeToString(fmt.Appendf(nil, "%s/%s", hash, name))
 		c.Header("ETag", httptoo.EncodeQuotedString(etag))
 	}
 	if name == "" {

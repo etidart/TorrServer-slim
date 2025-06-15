@@ -109,7 +109,7 @@ func (v *XPathDBRouter) getDBName(db TorrServerDB) string {
 	return v.dbNames[db]
 }
 
-func (v *XPathDBRouter) log(s string, params ...interface{}) {
+func (v *XPathDBRouter) log(s string, params ...any) {
 	if len(params) > 0 {
 		log.Printf("XPathDBRouter: %s: %s", s, fmt.Sprint(params...))
 	} else {

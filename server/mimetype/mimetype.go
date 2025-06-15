@@ -47,7 +47,7 @@ func init() {
 		{"text/smi", ".smi"},
 		{"text/ssa", ".ssa"},
 	} {
-		for _, ext := range strings.Split(t.extensions, ",") {
+		for ext := range strings.SplitSeq(t.extensions, ",") {
 			err := mime.AddExtensionType(ext, t.mimeType)
 			if err != nil {
 				panic(err)

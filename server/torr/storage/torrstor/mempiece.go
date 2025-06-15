@@ -40,10 +40,7 @@ func (p *MemPiece) ReadAt(b []byte, off int64) (n int, err error) {
 
 	size := len(b)
 	if size+int(off) > len(p.buffer) {
-		size = len(p.buffer) - int(off)
-		if size < 0 {
-			size = 0
-		}
+		size = max(len(p.buffer)-int(off), 0)
 	}
 	if len(p.buffer) < int(off) || len(p.buffer) < int(off)+size {
 		return 0, io.EOF

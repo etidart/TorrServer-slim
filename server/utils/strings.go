@@ -54,7 +54,7 @@ func CommonPrefix(first, second string) string {
 
 	minLength := min(len(second), len(first))
 
-	for i := 0; i < minLength; i++ {
+	for i := range minLength {
 		if first[i] != second[i] {
 			break
 		}
